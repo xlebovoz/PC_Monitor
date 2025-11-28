@@ -1,0 +1,33 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc.exe build project",
+            "command": "C:\\Program Files\\mingw64\\bin\\gcc.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "src/main.c",
+                "src/cpu_info.c",
+                "src/memory_info.c", 
+                "src/system_info.c",
+                "-o",
+                "${workspaceFolder}\\PC_Monitor.exe",
+                "-Iinclude",
+                "-static"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Компиляция всего проекта"
+        }
+    ],
+    "version": "2.0.0"
+}
