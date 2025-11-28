@@ -1,7 +1,10 @@
 *.exe
+*.bat
 *.o
 *.obj
 *.dll
+
+build.bat
 
 *.com
 *.scr
