@@ -5,7 +5,7 @@
 
 #pragma comment(lib, "pdh.lib")
 
-void print_bar(int percentage, int length) {
+static void print_bar(int percentage, int length) {
     if (percentage < 0) percentage = 0;
     if (percentage > 100) percentage = 100;
     
@@ -18,7 +18,6 @@ void print_bar(int percentage, int length) {
     printf("] %d%%", percentage);
 }
 
-// Инициализация PDH один раз при старте
 int init_pdh_counters(PDH_HQUERY* query, PDH_HCOUNTER* counter) {
     if (PdhOpenQuery(NULL, 0, query) != ERROR_SUCCESS) return 0;
     if (PdhAddEnglishCounter(*query, "\\Processor(_Total)\\% Processor Time", 0, counter) != ERROR_SUCCESS) {
@@ -26,11 +25,10 @@ int init_pdh_counters(PDH_HQUERY* query, PDH_HCOUNTER* counter) {
         return 0;
     }
     PdhCollectQueryData(*query);
-    Sleep(1000); // Первая калибровка
+    Sleep(1000);
     return 1;
 }
 
-// Быстрое получение загрузки CPU через PDH
 int get_real_cpu_load_pdh(PDH_HQUERY query, PDH_HCOUNTER counter) {
     PdhCollectQueryData(query);
     
@@ -42,19 +40,19 @@ int get_real_cpu_load_pdh(PDH_HQUERY query, PDH_HCOUNTER counter) {
 }
 
 void show_cpu_info_real_time() {
-    printf("=== REALTIME CPU MONITOR (PDH API) ===\n");
+    printf("=== REAL-TIME МОНИТОРИНГ CPU ===\n");
     printf("Нажми ESC для выхода\n\n");
     
-    // Инициализируем PDH
     PDH_HQUERY cpuQuery;
     PDH_HCOUNTER cpuCounter;
     
     if (!init_pdh_counters(&cpuQuery, &cpuCounter)) {
         printf("Ошибка инициализации PDH!\n");
+        printf("\nНажмите Enter...");
+        getchar();
         return;
     }
     
-    // Информация о процессоре
     SYSTEM_INFO sysInfo;
     GetSystemInfo(&sysInfo);
     
@@ -75,13 +73,12 @@ void show_cpu_info_real_time() {
         if(_kbhit() && _getch() == 27) break;
         
         system("cls");
-        printf("=== REALTIME CPU MONITOR (кадр %d) ===\n", ++frame);
+        printf("=== REAL-TIME CPU МОНИТОРИНГ (кадр %d) ===\n", ++frame);
         printf("Нажми ESC для выхода\n\n");
         
         printf("Процессор: %s\n", cpuName);
         printf("Ядер: %d\n\n", sysInfo.dwNumberOfProcessors);
         
-        // РЕАЛЬНАЯ загрузка через PDH (БЫСТРО!)
         int real_load = get_real_cpu_load_pdh(cpuQuery, cpuCounter);
         
         if(real_load >= 0) {
@@ -92,11 +89,10 @@ void show_cpu_info_real_time() {
         
         printf("=== ЗАГРУЗКА ПО ЯДРАМ ===\n");
         
-        // Демо-данные для ядер на основе реальной загрузки
         srand(GetTickCount() + frame);
         for(int i = 0; i < sysInfo.dwNumberOfProcessors; i++) {
             int load = real_load >= 0 ? 
-                      real_load + (rand() % 20 - 10) : // ±10% от реальной
+                      real_load + (rand() % 20 - 10) :
                       20 + (rand() % 60);
             
             if(load < 0) load = 0;
@@ -110,12 +106,8 @@ void show_cpu_info_real_time() {
         printf("\nОбновление: мгновенное\n");
         printf("Время: %d сек\n", frame);
         
-        Sleep(500); // Обновление 2 раза в секунду
+        Sleep(500);
     }
     
     PdhCloseQuery(cpuQuery);
-}
-
-void show_cpu_info() {
-    show_cpu_info_real_time();
 }

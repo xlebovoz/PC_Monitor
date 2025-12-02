@@ -4,8 +4,9 @@
 #include <stdio.h>
 #include <windows.h>
 
-// Только две основные функции
-void show_cpu_info();
-void show_memory_info();
+// Только новые функции
+void show_cpu_info_real_time();
+void show_memory_info_real_time();
+void show_disk_info();
 
 #endif
